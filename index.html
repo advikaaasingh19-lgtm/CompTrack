@@ -9,7 +9,6 @@
 <meta name="theme-color" content="#7a1f2b">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
 <style>
 :root{
   --bg:#faf1de; --panel:#ffffff; --panel-2:#fff8ec; --ink:#3a1418; --dim:#8a6a55; --rule:#e9d9b8;
@@ -205,8 +204,8 @@ footer{text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;c
 
 <div class="wrap" id="analyticsView">
   <div class="an-cards">
-    <div class="an-card"><h4>ACCURACY OVER TIME</h4><canvas id="accChart" height="150"></canvas></div>
-    <div class="an-card"><h4>ACCURACY BY SUBJECT</h4><canvas id="subjChart" height="150"></canvas></div>
+    <div class="an-card"><h4>ACCURACY OVER TIME</h4><div id="accChart"></div></div>
+    <div class="an-card"><h4>ACCURACY BY SUBJECT</h4><div id="subjChart"></div></div>
   </div>
   <div class="weak-list" id="weakList"></div>
 </div>
@@ -522,7 +521,6 @@ function renderRevisionQueue(){
   });
 }
 
-let accChartInstance = null, subjChartInstance = null;
 function renderAnalytics(){
   const weakList = document.getElementById('weakList');
   const subjAcc = computeSubjectAccuracy();
@@ -535,29 +533,34 @@ function renderAnalytics(){
         <div class="weak-row"><span class="swatch" style="background:${SUBJECTS[s.s].color}"></span>
           <span class="lbl">${SUBJECTS[s.s].name}</span><span class="pct">${s.pct}%</span></div>`).join(''));
 
-  if(typeof Chart === 'undefined') return; // library failed to load, skip charts gracefully
+  document.getElementById('accChart').innerHTML = lineChartSVG(state.history.map(h=>Math.round(h.score/h.total*100)));
+  document.getElementById('subjChart').innerHTML = barChartSVG(attempted);
+}
 
-  const hist = state.history;
-  const accCtx = document.getElementById('accChart');
-  const subjCtx = document.getElementById('subjChart');
-  if(accChartInstance) accChartInstance.destroy();
-  if(subjChartInstance) subjChartInstance.destroy();
-
-  accChartInstance = new Chart(accCtx, {
-    type:'line',
-    data:{ labels: hist.map((h,i)=>'Q'+(i+1)),
-      datasets:[{ label:'Accuracy %', data: hist.map(h=>Math.round(h.score/h.total*100)),
-        borderColor:'#7a1f2b', backgroundColor:'#7a1f2b33', tension:.3, fill:true, pointRadius:3 }]},
-    options:{ responsive:true, plugins:{legend:{display:false}}, scales:{y:{min:0,max:100}} }
-  });
-
-  subjChartInstance = new Chart(subjCtx, {
-    type:'bar',
-    data:{ labels: attempted.map(s=>s.s.toUpperCase()),
-      datasets:[{ label:'Accuracy %', data: attempted.map(s=>s.pct),
-        backgroundColor: attempted.map(s=>SUBJECTS[s.s].color) }]},
-    options:{ responsive:true, plugins:{legend:{display:false}}, scales:{y:{min:0,max:100}} }
-  });
+const CH = {W:400,H:190,L:34,R:12,T:14,B:26};
+function chY(v){ return CH.T + (100-v)*(CH.H-CH.T-CH.B)/100; }
+function chGrid(){
+  return [0,50,100].map(v=>`<line x1="${CH.L}" x2="${CH.W-CH.R}" y1="${chY(v)}" y2="${chY(v)}" style="stroke:var(--rule)" stroke-dasharray="3 3"/><text x="${CH.L-6}" y="${chY(v)+4}" text-anchor="end" font-size="10" style="fill:var(--dim)">${v}</text>`).join('');
+}
+function lineChartSVG(vals){
+  if(!vals.length) return '<p class="an-empty">Submit a quiz to see your accuracy trend.</p>';
+  const x = i => vals.length===1 ? CH.L+(CH.W-CH.L-CH.R)/2 : CH.L + i*(CH.W-CH.L-CH.R)/(vals.length-1);
+  const pts = vals.map((v,i)=>`${x(i)},${chY(v)}`).join(' ');
+  const dots = vals.map((v,i)=>`<circle cx="${x(i)}" cy="${chY(v)}" r="3.5" fill="#7a1f2b"/>`).join('');
+  const step = Math.ceil(vals.length/10);
+  const xl = vals.map((v,i)=> i%step===0 ? `<text x="${x(i)}" y="${CH.H-8}" text-anchor="middle" font-size="10" style="fill:var(--dim)">${i+1}</text>` : '').join('');
+  return `<svg viewBox="0 0 ${CH.W} ${CH.H}" style="width:100%;height:auto" role="img" aria-label="Quiz accuracy over time">${chGrid()}<polyline points="${pts}" fill="none" stroke="#7a1f2b" stroke-width="2"/>${dots}${xl}</svg>`;
+}
+function barChartSVG(items){
+  if(!items.length) return '<p class="an-empty">No subject data yet.</p>';
+  const bw = (CH.W-CH.L-CH.R)/items.length;
+  const bars = items.map((s,i)=>{
+    const w = Math.min(bw*.6, 50), bx = CH.L + i*bw + (bw-w)/2;
+    return `<rect x="${bx}" y="${chY(s.pct)}" width="${w}" height="${chY(0)-chY(s.pct)}" rx="3" fill="${SUBJECTS[s.s].color}"/>
+      <text x="${bx+w/2}" y="${CH.H-8}" text-anchor="middle" font-size="10" style="fill:var(--dim)">${s.s.toUpperCase()}</text>
+      <text x="${bx+w/2}" y="${chY(s.pct)-4}" text-anchor="middle" font-size="10" style="fill:var(--ink)">${s.pct}%</text>`;
+  }).join('');
+  return `<svg viewBox="0 0 ${CH.W} ${CH.H}" style="width:100%;height:auto" role="img" aria-label="Accuracy by subject">${chGrid()}${bars}</svg>`;
 }
 
 function switchView(v){
