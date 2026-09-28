@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tech Dussehra — 30 Days of Third Year Computer Engineering</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#7a1f2b">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#faf1de; --panel:#ffffff; --panel-2:#fff8ec; --ink:#3a1418; --dim:#8a6a55; --rule:#e9d9b8;
+  --maroon:#7a1f2b; --saffron:#e08a1e; --gold:#c9932e; --green:#1f4d3d; --blue:#3f6fb0; --brown:#8a5a2b;
+  color-scheme:light;
+}
+body.dark{
+  --bg:#1a1013; --panel:#241619; --panel-2:#2b191d; --ink:#f2e3ce; --dim:#b89a84; --rule:#43282b;
+  color-scheme:dark;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,Segoe UI,Roboto,sans-serif;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);transition:background .2s,color .2s;}
+.mono{font-family:'JetBrains Mono',monospace;}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px 70px;}
+
+/* header */
+header{display:flex;justify-content:space-between;align-items:center;padding:20px 20px;border-bottom:1px solid var(--rule);
+  position:sticky;top:0;background:var(--bg);z-index:5;flex-wrap:wrap;gap:10px;}
+.brand{display:flex;align-items:center;gap:10px;}
+.brand svg{width:26px;height:26px;}
+.brand b{font-family:'Fraunces',serif;font-size:19px;}
+.brand small{display:block;font-size:11px;color:var(--dim);font-family:'JetBrains Mono',monospace;}
+.hdr-right{display:flex;align-items:center;gap:16px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--dim);}
+.streak{display:flex;align-items:center;gap:5px;}
+#themeBtn{background:none;border:1px solid var(--rule);border-radius:20px;padding:6px 12px;cursor:pointer;color:var(--ink);font-size:12px;font-family:'JetBrains Mono',monospace;}
+
+/* hero */
+.hero{text-align:center;padding:54px 20px 40px;position:relative;}
+.hero .flame{width:40px;height:52px;margin:0 auto 18px;}
+.hero h1{font-family:'Fraunces',serif;font-weight:700;font-size:clamp(30px,5.5vw,48px);margin:0 0 12px;
+  background:linear-gradient(90deg,var(--maroon),var(--saffron));-webkit-background-clip:text;background-clip:text;color:transparent;}
+.hero p{color:var(--dim);font-size:15.5px;max-width:52ch;margin:0 auto 26px;line-height:1.5;}
+.progress-ring{max-width:420px;margin:0 auto 26px;}
+.bar-outer{background:var(--rule);border-radius:20px;height:10px;overflow:hidden;}
+.bar-inner{background:linear-gradient(90deg,var(--saffron),var(--maroon));height:100%;border-radius:20px;transition:width .3s;}
+.progress-label{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--dim);margin-top:8px;}
+.startBtn{font-family:'JetBrains Mono',monospace;background:var(--maroon);color:#fff8ec;border:none;border-radius:24px;
+  padding:12px 26px;font-size:13px;cursor:pointer;letter-spacing:.02em;}
+
+/* controls */
+.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin:0 0 20px;}
+#search{flex:1;min-width:160px;background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:10px 12px;
+  color:var(--ink);font-size:13px;font-family:inherit;}
+.subj-filters{display:flex;gap:6px;flex-wrap:wrap;}
+.subj-filters button{font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--panel);border:1px solid var(--rule);
+  border-radius:14px;padding:6px 11px;cursor:pointer;color:var(--dim);}
+.subj-filters button.active{color:#fff;border-color:transparent;}
+
+/* subject progress */
+.subj-progress{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:30px;}
+.sp-card{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:12px 14px;}
+.sp-card .name{font-size:12px;font-weight:600;margin-bottom:6px;}
+.sp-card .bar-outer{height:6px;}
+.sp-card .pct{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--dim);margin-top:5px;}
+
+/* calendar grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px;}
+.day-card{background:var(--panel);border:1px solid var(--rule);border-radius:12px;aspect-ratio:1/1;padding:10px;
+  cursor:pointer;position:relative;display:flex;flex-direction:column;justify-content:space-between;transition:transform .12s;}
+.day-card:hover{transform:translateY(-2px);}
+.day-card.locked{cursor:not-allowed;opacity:.5;}
+.day-card.today{box-shadow:0 0 0 2px var(--saffron),0 0 14px 2px rgba(224,138,30,.4);}
+.day-card.completed{border-color:var(--green);}
+.day-card.hidden-card{display:none;}
+.dc-num{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:16px;}
+.dc-subj{font-size:10px;font-family:'JetBrains Mono',monospace;padding:2px 6px;border-radius:4px;align-self:flex-start;color:#fff;}
+.dc-icon{width:18px;height:18px;opacity:.85;}
+.dc-status{position:absolute;top:8px;right:8px;width:18px;height:18px;}
+.diya-dot{position:absolute;bottom:8px;right:8px;width:6px;height:6px;border-radius:50%;background:var(--saffron);opacity:.6;}
+
+/* modal */
+.overlay{position:fixed;inset:0;background:rgba(20,8,10,.6);display:none;align-items:flex-start;justify-content:center;
+  padding:30px 16px;overflow-y:auto;z-index:20;}
+.overlay.show{display:flex;}
+.modal{background:var(--panel);border-radius:16px;max-width:640px;width:100%;padding:28px 26px 30px;position:relative;margin-top:20px;}
+.modal .closeX{position:absolute;top:16px;right:18px;background:none;border:none;font-size:22px;color:var(--dim);cursor:pointer;}
+.m-kicker{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim);margin:0 0 6px;}
+.m-title{font-family:'Fraunces',serif;font-size:26px;font-weight:600;margin:0 0 16px;}
+.m-block{margin-bottom:18px;}
+.m-block h4{font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--maroon);margin:0 0 6px;letter-spacing:.03em;}
+.m-block p, .m-block li{font-size:14.5px;line-height:1.55;color:var(--ink);margin:0;}
+.m-block ul{margin:0;padding-left:18px;}
+.qr-box{background:var(--panel-2);border-left:3px solid var(--saffron);padding:12px 14px;border-radius:0 8px 8px 0;font-size:14px;font-style:italic;}
+.quiz-q{margin-bottom:14px;}
+.quiz-q p{font-size:14.5px;font-weight:600;margin:0 0 8px;}
+.opt{display:block;width:100%;text-align:left;background:var(--panel-2);border:1px solid var(--rule);border-radius:8px;
+  padding:9px 12px;margin-bottom:6px;cursor:pointer;font-size:13.5px;color:var(--ink);}
+.opt.correct{border-color:var(--green);background:#1f4d3d22;}
+.opt.wrong{border-color:var(--maroon);background:#7a1f2b22;}
+.opt.picked:not(.correct):not(.wrong){border-color:var(--gold);}
+.opt:disabled{cursor:default;}
+.submitBtn,.completeBtn{font-family:'JetBrains Mono',monospace;background:var(--maroon);color:#fff8ec;border:none;
+  border-radius:20px;padding:11px 20px;font-size:12.5px;cursor:pointer;margin-top:6px;}
+.completeBtn{background:var(--green);}
+.result-line{font-family:'JetBrains Mono',monospace;font-size:13px;margin:10px 0;color:var(--dim);}
+
+/* victory */
+.victory{background:var(--panel);border-radius:16px;padding:40px 30px;text-align:center;}
+.victory h2{font-family:'Fraunces',serif;font-size:32px;background:linear-gradient(90deg,var(--saffron),var(--maroon));
+  -webkit-background-clip:text;background-clip:text;color:transparent;margin:0 0 14px;}
+.victory p{color:var(--dim);font-size:14px;margin:6px 0;}
+
+footer{text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim);padding:30px 20px 10px;}
+#resetBtn{background:none;border:none;color:var(--maroon);text-decoration:underline;cursor:pointer;font-size:11px;font-family:inherit;}
+
+/* nav tabs */
+.navtabs{display:flex;gap:4px;background:var(--panel-2);border-radius:20px;padding:3px;}
+.navtabs button{font-family:'JetBrains Mono',monospace;font-size:11.5px;background:none;border:none;border-radius:16px;
+  padding:6px 13px;cursor:pointer;color:var(--dim);}
+.navtabs button.active{background:var(--maroon);color:#fff8ec;}
+
+/* offline banner */
+.offline-banner{display:none;background:var(--gold);color:#2a1a08;text-align:center;font-family:'JetBrains Mono',monospace;
+  font-size:12px;padding:7px;}
+.offline-banner.show{display:block;}
+
+/* revision queue */
+.rq{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:16px 18px;margin-bottom:24px;}
+.rq h3{font-family:'Fraunces',serif;font-size:16px;margin:0 0 4px;}
+.rq .sub{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim);margin:0 0 12px;}
+.rq-empty{font-size:13px;color:var(--dim);}
+.rq-item{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-top:1px dashed var(--rule);}
+.rq-item:first-of-type{border-top:none;}
+.rq-item .name{font-size:13.5px;font-weight:600;}
+.rq-item .meta{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim);}
+.rq-item button{font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--maroon);color:#fff8ec;
+  border:none;border-radius:14px;padding:6px 11px;cursor:pointer;}
+
+/* analytics view */
+#analyticsView{display:none;}
+.an-cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
+.an-card{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:18px;}
+.an-card h4{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim);margin:0 0 12px;letter-spacing:.03em;}
+.an-card canvas{max-height:220px;}
+.weak-list{background:var(--panel);border:1px solid var(--rule);border-radius:12px;padding:18px;}
+.weak-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px dashed var(--rule);}
+.weak-row:first-of-type{border-top:none;}
+.weak-row .swatch{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.weak-row .lbl{flex:1;font-size:13.5px;}
+.weak-row .pct{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--dim);}
+.an-empty{font-size:13px;color:var(--dim);text-align:center;padding:20px 0;}
+@media(max-width:640px){.an-cards{grid-template-columns:1fr;}}
+@media(max-width:480px){.grid{grid-template-columns:repeat(3,1fr);}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M12 2c2 3-1 4-1 7a3 3 0 106 0c0-2-1-3-1-5 2 2 3 5 3 8a7 7 0 11-14 0c0-4 2-7 7-10z" fill="#e08a1e"/></svg>
+    <div><b>Tech Dussehra</b><small>THIRD YEAR COMPUTER ENGINEERING</small></div>
+  </div>
+  <div class="hdr-right">
+    <div class="navtabs" id="navTabs">
+      <button class="active" data-v="cal">Calendar</button>
+      <button data-v="an">Dashboard</button>
+    </div>
+    <span class="streak">🔥 <span id="streakVal">0</span>-day streak</span>
+    <span id="progressPct">0% complete</span>
+    <button id="themeBtn">☾ Dark</button>
+  </div>
+</header>
+<div class="offline-banner" id="offlineBanner">You're offline — showing cached content</div>
+
+<div class="hero" id="heroSection">
+  <svg class="flame" viewBox="0 0 24 30" fill="none"><ellipse cx="12" cy="24" rx="9" ry="4" fill="#c9932e"/><path d="M12 2c2.4 3.6-1.2 4.8-1.2 8.4a3.6 3.6 0 107.2 0c0-2.4-1.2-3.6-1.2-6 2.4 2.4 3.6 6 3.6 9.6a8.4 8.4 0 11-16.8 0c0-4.8 2.4-8.4 8.4-12z" fill="#e08a1e"/></svg>
+  <h1>Your 30-Day Engineering Victory Journey</h1>
+  <p>Unlock one challenge every day and conquer your syllabus — 30 days, 6 subjects, one victory.</p>
+  <div class="progress-ring">
+    <div class="bar-outer"><div class="bar-inner" id="heroBar" style="width:0%"></div></div>
+    <div class="progress-label"><span id="heroLabel">0 / 30 days completed</span></div>
+  </div>
+  <button class="startBtn" id="startBtn">Start Today's Challenge →</button>
+</div>
+
+<div class="wrap" id="calendarView">
+  <div class="rq" id="rqBox"></div>
+
+  <div class="subj-progress" id="subjProgress"></div>
+
+  <div class="controls">
+    <input id="search" type="text" placeholder="Search a topic…">
+    <div class="subj-filters" id="subjFilters"></div>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <footer>
+    Progress saved in this browser only. <button id="resetBtn">Reset all progress</button>
+  </footer>
+</div>
+
+<div class="wrap" id="analyticsView">
+  <div class="an-cards">
+    <div class="an-card"><h4>ACCURACY OVER TIME</h4><canvas id="accChart" height="150"></canvas></div>
+    <div class="an-card"><h4>ACCURACY BY SUBJECT</h4><canvas id="subjChart" height="150"></canvas></div>
+  </div>
+  <div class="weak-list" id="weakList"></div>
+</div>
+
+<div class="overlay" id="overlay"><div class="modal" id="modalBody"></div></div>
+
+<script>
+const SUBJECTS = {
+  ai:{name:'Artificial Intelligence',color:'#e08a1e'},
+  cn:{name:'Computer Networks',color:'#1f4d3d'},
+  cc:{name:'Cloud Computing',color:'#3f6fb0'},
+  dpdp:{name:'Data Privacy & Protection',color:'#7a1f2b'},
+  toc:{name:'Theory of Computation',color:'#8a5a2b'},
+  mix:{name:'Mixed Revision',color:'#c9932e'}
+};
+const ICONS = {
+  ai:'M12 2a5 5 0 00-5 5c0 2 1 3 1 5H8v4h8v-4h0c0-2 1-3 1-5a5 5 0 00-5-5zM9 18h6M10 21h4',
+  cn:'M4 6h16M4 12h16M4 18h16M4 6v3M20 6v3M4 18v-3M20 18v-3',
+  cc:'M7 17a4 4 0 01-.4-8A5.5 5.5 0 0117 9a4.5 4.5 0 010 8H7z',
+  dpdp:'M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z',
+  toc:'M6 4h6l6 6v10H6zM12 4v6h6',
+  mix:'M4 6h16M4 12h10M4 18h16'
+};
+
+const DATA = [
+ {d:1,s:'ai',t:'Introduction to Artificial Intelligence',ex:'AI is the field of computer science focused on building systems that perform tasks normally requiring human intelligence.',kp:['Reasoning, learning, perception, language','Weak AI vs strong AI','Turing Test as a benchmark idea'],def:'AI: designing computer systems capable of tasks that would normally need human intelligence.',eg:'A spam filter that learns to flag unwanted email is a narrow AI system.',qr:'AI = machines performing tasks that need human-like intelligence: reasoning, learning, perceiving.',
+  mc:[['Which is NOT a core AI capability?',['Reasoning','Learning','Compiling code','Perception'],2],['The Turing Test evaluates:',['Processor speed','Whether a machine\'s behavior is indistinguishable from a human\'s','Memory usage','Network latency'],1]]},
+ {d:2,s:'ai',t:'Intelligent Agents',ex:'An agent perceives its environment through sensors and acts on it through actuators, aiming to achieve a goal.',kp:['Percept, action, environment','Rational agent maximizes performance measure','Types: simple reflex, model-based, goal-based, utility-based'],def:'Agent: anything that perceives its environment and acts upon it to achieve goals.',eg:'A robot vacuum sensing dirt (percept) and moving to clean it (action) is a simple reflex agent.',qr:'An agent = perceive → decide → act, judged by a performance measure, not just correctness.',
+  mc:[['A thermostat that turns on heating below a set temperature is a:',['Utility-based agent','Simple reflex agent','Learning agent','Goal-based agent'],1],['What do actuators do?',['Sense the environment','Store data','Perform actions on the environment','Compile programs'],2]]},
+ {d:3,s:'ai',t:'Problem Solving & Search',ex:'Many AI problems reduce to searching a state space for a path from an initial state to a goal state.',kp:['Uninformed search: BFS, DFS','Informed search: A*, greedy best-first','Heuristics guide the search toward the goal faster'],def:'Search algorithm: a systematic method for exploring possible states to find a solution path.',eg:'A* pathfinding in a maze game uses distance-to-goal as a heuristic to search efficiently.',qr:'BFS finds the shortest path by level; A* is often faster because it uses a heuristic to guide the search.',
+  mc:[['Which search guarantees the shortest path in an unweighted graph?',['DFS','BFS','A* without heuristic','Greedy best-first'],1],['A heuristic function estimates:',['Total memory used','Cost from current state to goal','Number of nodes in the tree','Time complexity'],1]]},
+ {d:4,s:'ai',t:'Knowledge Representation',ex:'AI systems need a way to represent facts about the world so they can be reasoned over.',kp:['Propositional & predicate logic','Semantic networks','Frames and ontologies'],def:'Knowledge representation: encoding facts about the world in a form a computer can reason with.',eg:'A semantic network linking "Dog → is-a → Animal" lets a system infer a dog needs food, since animals do.',qr:'KR turns real-world facts into a structured form — logic, networks, or frames — that supports inference.',
+  mc:[['Predicate logic extends propositional logic by adding:',['Loops','Variables and quantifiers','Functions','Classes'],1],['A semantic network represents knowledge as:',['A single formula','Nodes and labeled relationships','A binary tree only','A quiz'],1]]},
+ {d:5,s:'ai',t:'Machine Learning Basics',ex:'Machine learning lets systems improve performance on a task from data, without being explicitly programmed for every case.',kp:['Supervised, unsupervised, reinforcement learning','Training data vs test data','Overfitting vs generalization'],def:'Machine learning: a system that improves its performance on a task through experience (data), not explicit rules.',eg:'An email classifier trained on thousands of labeled emails learns to spot spam patterns itself.',qr:'Supervised = learns from labeled data. Unsupervised = finds patterns in unlabeled data. Reinforcement = learns from reward signals.',
+  mc:[['A model that performs well on training data but poorly on new data is:',['Underfitting','Overfitting','Well generalized','Unsupervised'],1],['Which is a supervised learning task?',['Clustering customers','Predicting house price from labeled examples','Random exploration','Compressing an image'],1]]},
+ {d:6,s:'cn',t:'OSI vs TCP/IP Model',ex:'Both models layer networking functions, but OSI has 7 conceptual layers while TCP/IP has 4 practical ones actually used on the internet.',kp:['OSI: Physical, Data Link, Network, Transport, Session, Presentation, Application','TCP/IP: Link, Internet, Transport, Application','TCP/IP is what\'s actually implemented'],def:'A network model layers protocols so each layer handles one concern and can be developed independently.',eg:'HTTP (Application layer) rides on top of TCP (Transport layer) which rides on IP (Internet/Network layer).',qr:'OSI = 7-layer teaching model. TCP/IP = 4-layer model that\'s actually deployed on the real internet.',
+  mc:[['Which OSI layer handles routing between networks?',['Data Link','Network','Session','Presentation'],1],['TCP/IP\'s "Application" layer roughly maps to which OSI layers?',['Physical + Data Link','Network only','Session, Presentation, Application','Transport only'],2]]},
+ {d:7,s:'cn',t:'TCP vs UDP',ex:'TCP guarantees ordered, reliable delivery via handshakes and acknowledgements. UDP is connectionless and faster but offers no guarantees.',kp:['TCP: three-way handshake, retransmission, ordering','UDP: no handshake, minimal overhead','Choose based on reliability vs speed needs'],def:'Transport layer protocol: governs how data segments move reliably (or not) between two endpoints.',eg:'Video calls use UDP (a dropped frame is fine) while file downloads use TCP (every byte must arrive).',qr:'TCP = reliable but slower. UDP = fast but no delivery guarantee. Match protocol to what the app can tolerate losing.',
+  mc:[['Which protocol uses a three-way handshake?',['UDP','TCP','ICMP','ARP'],1],['UDP is typically preferred for:',['Bank transfers','File downloads','Live video/audio streaming','Email'],2]]},
+ {d:8,s:'cn',t:'IP Addressing & Subnetting',ex:'Subnetting divides a large network into smaller, manageable sub-networks using a subnet mask.',kp:['IPv4 = 32 bits, 4 octets','Subnet mask separates network and host portions','CIDR notation, e.g. /24'],def:'Subnetting: splitting one network into multiple smaller networks for better address management and security.',eg:'192.168.1.0/24 gives 256 addresses; splitting it into two /25 subnets gives 128 addresses each.',qr:'A subnet mask tells you which bits of an IP identify the network vs the host — CIDR (/24 etc.) is the shorthand for it.',
+  mc:[['A /24 subnet mask allows how many host addresses (usable)?',['24','254','256','128'],1],['CIDR notation like /26 tells you:',['The MAC address','Number of network bits in the mask','The port number','The protocol used'],1]]},
+ {d:9,s:'cn',t:'Routing Algorithms',ex:'Routers decide the next hop for a packet using routing algorithms that build and share routing tables.',kp:['Distance vector (e.g. RIP)','Link state (e.g. OSPF)','Metrics: hop count, bandwidth, delay'],def:'Routing algorithm: a method routers use to determine the best path for forwarding packets.',eg:'OSPF routers share their full link-state map so each can independently compute shortest paths.',qr:'Distance-vector routers share info with neighbors only; link-state routers share their view with the whole network.',
+  mc:[['RIP is an example of which routing approach?',['Link state','Distance vector','Static routing','Flooding'],1],['OSPF routers compute shortest paths using:',['Random selection','A shared link-state map of the network','Only hop count','Manual configuration each time'],1]]},
+ {d:10,s:'cn',t:'Application Layer Protocols',ex:'The application layer hosts the protocols users interact with directly: web pages, file transfer, and name resolution.',kp:['HTTP/HTTPS for web','FTP for file transfer','DNS for name-to-IP resolution'],def:'Application layer protocol: a set of rules governing how a specific user-facing service communicates over the network.',eg:'When you type a URL, DNS resolves the name, then HTTPS fetches the page over an encrypted TCP connection.',qr:'HTTP serves web content, FTP moves files, DNS turns names into IPs — each is a separate application-layer protocol.',
+  mc:[['Which protocol resolves domain names into IP addresses?',['HTTP','FTP','DNS','SMTP'],2],['HTTPS differs from HTTP mainly by adding:',['Faster speed','Encryption (TLS/SSL)','More ports','Smaller packets'],1]]},
+ {d:11,s:'cc',t:'Cloud Service Models',ex:'Cloud computing offers different layers of managed infrastructure: IaaS, PaaS, and SaaS, each handing over more control to the provider.',kp:['IaaS: raw compute/storage (e.g. VMs)','PaaS: platform to deploy apps without managing servers','SaaS: ready-to-use software'],def:'Service model: defines how much of the stack (infrastructure, platform, or software) the cloud provider manages for you.',eg:'AWS EC2 is IaaS, Google App Engine is PaaS, and Gmail is SaaS.',qr:'IaaS = you manage the OS up. PaaS = you manage just your app. SaaS = you just use the app.',
+  mc:[['Which service model gives you the most control over the OS?',['SaaS','PaaS','IaaS','None'],2],['Gmail is an example of:',['IaaS','PaaS','SaaS','On-premise software'],2]]},
+ {d:12,s:'cc',t:'Cloud Deployment Models',ex:'Deployment models describe who owns and who can access the cloud infrastructure.',kp:['Public: shared, offered by a provider','Private: dedicated to one organization','Hybrid: mix of public + private','Community: shared by organizations with common concerns'],def:'Deployment model: describes the ownership and accessibility scope of a cloud environment.',eg:'A bank might keep sensitive data on a private cloud while using public cloud for its website — a hybrid setup.',qr:'Public = shared & cheap. Private = dedicated & controlled. Hybrid = both, split by sensitivity.',
+  mc:[['A cloud dedicated to a single organization is called:',['Public cloud','Private cloud','Community cloud','Multi-cloud'],1],['Using both private and public cloud together is called:',['Hybrid cloud','Edge cloud','Community cloud','Fog computing'],0]]},
+ {d:13,s:'cc',t:'Virtualization',ex:'Virtualization lets one physical machine run multiple isolated virtual machines, each with its own OS.',kp:['Hypervisor manages VMs (Type 1 & Type 2)','Improves hardware utilization','Enables cloud multi-tenancy'],def:'Virtualization: creating a software-based (virtual) version of hardware resources like servers or storage.',eg:'A single physical server running VMware ESXi can host ten independent virtual servers for different clients.',qr:'A hypervisor sits between hardware and VMs, letting one machine safely run many isolated operating systems.',
+  mc:[['A Type 1 hypervisor runs:',['Inside another OS','Directly on the hardware','Only in the browser','On mobile only'],1],['The main benefit of virtualization in cloud is:',['Slower performance','Better hardware utilization via multiple VMs','No need for an OS','Eliminating networking'],1]]},
+ {d:14,s:'cc',t:'Cloud Storage & Security',ex:'Cloud storage keeps data on provider-managed servers, raising specific security responsibilities shared between provider and customer.',kp:['Shared responsibility model','Encryption at rest and in transit','Access control (IAM)'],def:'Shared responsibility model: the cloud provider secures the infrastructure; the customer secures their data and access configuration.',eg:'AWS secures its data centers, but a misconfigured S3 bucket left public is the customer\'s responsibility.',qr:'The provider secures the cloud itself; you\'re responsible for securing what you put in it and who can access it.',
+  mc:[['Under the shared responsibility model, who secures customer data configuration?',['Only the provider','Only the customer','Both, per their defined scope','Neither'],2],['Encrypting data while it moves over the network is called encryption:',['At rest','In transit','At compile time','Offline'],1]]},
+ {d:15,s:'cc',t:'Containers & Docker Basics',ex:'Containers package an application with its dependencies so it runs consistently across environments, lighter than a full VM.',kp:['Containers share the host OS kernel','Docker image vs container','Faster startup than VMs'],def:'Container: a lightweight, standalone package of software and its dependencies, isolated from the host OS.',eg:'A Docker image with a web app plus its Node.js runtime runs the same way on a laptop and in production.',qr:'Containers share the host kernel (lighter, faster) while VMs each run a full separate OS (heavier, more isolated).',
+  mc:[['What do containers share with the host, unlike VMs?',['The file system only','The OS kernel','Nothing','The GPU'],1],['A Docker image becomes a running container when it is:',['Compiled','Pushed to a registry','Started/run','Deleted'],2]]},
+ {d:16,s:'dpdp',t:'Introduction to Data Privacy',ex:'Data privacy concerns how personal data is collected, used, and shared — and giving individuals control over it.',kp:['Personal data vs sensitive personal data','Consent as a legal basis','Data minimization principle'],def:'Data privacy: the right of individuals to control how their personal information is collected and used.',eg:'A fitness app asking explicit consent before sharing your location data with advertisers is respecting data privacy.',qr:'Privacy is about individual control over personal data — consent and minimal collection are its core ideas.',
+  mc:[['Which is an example of sensitive personal data?',['Favorite color','Health records','Public username','Preferred language'],1],['Data minimization means:',['Collecting all data possible','Collecting only what\'s necessary for the purpose','Deleting all data immediately','Encrypting everything'],1]]},
+ {d:17,s:'dpdp',t:'Data Protection Principles',ex:'Regulations like GDPR set principles that organizations must follow when handling personal data.',kp:['Lawfulness, fairness, transparency','Purpose limitation','Storage limitation & accountability'],def:'Data protection principle: a rule (like GDPR\'s) that governs lawful, fair, and limited use of personal data.',eg:'A company collecting emails "for newsletters" can\'t later sell that list to a third party — that breaks purpose limitation.',qr:'GDPR-style principles: be transparent, use data only for the stated purpose, and don\'t keep it longer than needed.',
+  mc:[['Using collected data only for the purpose it was gathered for is:',['Storage limitation','Purpose limitation','Data minimization','Accountability'],1],['GDPR primarily governs data protection for individuals in:',['The USA only','The European Union','India only','Global military data'],1]]},
+ {d:18,s:'dpdp',t:'Encryption & Anonymization',ex:'Encryption and anonymization are two techniques for protecting personal data from unauthorized exposure.',kp:['Encryption: reversible with a key','Anonymization: irreversibly removes identifying info','Pseudonymization: replaces identifiers, reversible with extra data'],def:'Anonymization: processing data so the individual it describes can no longer be identified, even indirectly.',eg:'Replacing names with random IDs in a dataset (pseudonymization) vs stripping all identifying fields entirely (anonymization).',qr:'Encryption protects data with a reversible key; true anonymization removes identity permanently, with no way back.',
+  mc:[['Which technique can be reversed with a decryption key?',['Anonymization','Encryption','Deletion','Aggregation'],1],['Truly anonymized data means:',['It can be re-identified with a key','The individual can no longer be identified at all','It\'s just password protected','It\'s stored in the cloud'],1]]},
+ {d:19,s:'dpdp',t:'Data Breaches & Risk Management',ex:'A data breach is unauthorized access to protected data; organizations must assess and reduce this risk proactively.',kp:['Breach notification requirements','Risk assessment (likelihood x impact)','Incident response plans'],def:'Data breach: an incident where protected data is accessed, disclosed, or stolen without authorization.',eg:'A hacked customer database exposing emails and passwords triggers mandatory breach notification under many laws.',qr:'Risk management = identify what could go wrong, estimate impact, and have a response plan ready before it happens.',
+  mc:[['A data breach specifically refers to:',['Slow website performance','Unauthorized access/disclosure of protected data','A software update','A backup process'],1],['Risk is generally assessed as a function of:',['Cost and time only','Likelihood and impact','Team size','Server location'],1]]},
+ {d:20,s:'dpdp',t:'Privacy by Design',ex:'Privacy by Design means building privacy protections into a system from the start, not adding them as an afterthought.',kp:['Proactive, not reactive','Privacy as the default setting','End-to-end security throughout the lifecycle'],def:'Privacy by Design: an approach where privacy safeguards are embedded into system design from the very beginning.',eg:'An app that defaults new users\' profiles to "private" (rather than public) is applying privacy by design.',qr:'Privacy by Design bakes protection into the architecture itself, with privacy-friendly settings as the default.',
+  mc:[['Privacy by Design mainly emphasizes:',['Fixing privacy issues after a breach','Embedding privacy into design from the start','Ignoring user settings','Charging users for privacy'],1],['A privacy-friendly default setting would be:',['Public profile by default','Private profile by default','No settings at all','Data shared automatically'],1]]},
+ {d:21,s:'toc',t:'Finite Automata',ex:'Finite automata are simple abstract machines that accept or reject strings based on a fixed number of states.',kp:['DFA: exactly one transition per input per state','NFA: multiple or no transitions allowed','Both recognize regular languages'],def:'Finite automaton: an abstract machine with a finite set of states that processes input symbol by symbol.',eg:'A DFA that accepts binary strings ending in "01" can be drawn with just three states.',qr:'DFA = deterministic, one path per input. NFA = nondeterministic, multiple paths allowed — both recognize the same language class.',
+  mc:[['What distinguishes an NFA from a DFA?',['NFA has more states always','NFA allows multiple/no transitions for an input','NFA can\'t be converted to a DFA','NFA has no start state'],1],['Finite automata are used to recognize which language class?',['Context-free languages','Regular languages','Recursively enumerable languages','Turing-decidable languages only'],1]]},
+ {d:22,s:'toc',t:'Regular Expressions & Regular Languages',ex:'Regular expressions are a compact notation for describing regular languages — exactly what finite automata can recognize.',kp:['Operators: union, concatenation, Kleene star','Every regex has an equivalent finite automaton','Used in pattern matching, lexers'],def:'Regular language: a language that can be expressed by a regular expression or recognized by a finite automaton.',eg:'The regex (a|b)*abb matches any string of a\'s and b\'s that ends in "abb".',qr:'Regex, DFA, and NFA are three equivalent ways to describe the exact same class: regular languages.',
+  mc:[['Which operator represents "zero or more repetitions" in regex?',['+','*','?','|'],1],['Every regular expression can be converted into an equivalent:',['Turing machine only','Finite automaton','Context-free grammar only','Pushdown automaton only'],1]]},
+ {d:23,s:'toc',t:'Context-Free Grammars & Pushdown Automata',ex:'Context-free grammars generate languages that finite automata can\'t handle — like balanced parentheses — recognized by pushdown automata.',kp:['CFG productions: A → α','Pushdown automaton adds a stack to a finite automaton','Used to describe programming language syntax'],def:'Pushdown automaton (PDA): a finite automaton extended with a stack, letting it recognize context-free languages.',eg:'Balanced parentheses like "(()())" need a stack to track open brackets — a DFA alone can\'t do this, a PDA can.',qr:'CFGs generate context-free languages; PDAs (finite automaton + stack) are the machines that recognize them.',
+  mc:[['What does a PDA have that a plain finite automaton doesn\'t?',['More states','A stack','A tape','Parallel processing'],1],['Balanced parentheses is an example of a language that is:',['Regular','Context-free but not regular','Not expressible at all','Finite'],1]]},
+ {d:24,s:'toc',t:'Turing Machines',ex:'A Turing machine is a theoretical model with an infinite tape, capable of computing anything that is algorithmically computable.',kp:['Infinite tape + read/write head','More powerful than PDA/finite automata','Defines what "computable" means'],def:'Turing machine: an abstract computing device with an infinite tape used to define the limits of what\'s computable.',eg:'A Turing machine that increments a binary number on its tape models what any real computer program can, in principle, do.',qr:'Turing machines sit at the top of the automata hierarchy — anything a real computer can compute, a TM can compute.',
+  mc:[['What gives a Turing machine more power than a PDA?',['A second stack','An infinite tape it can read and write freely','More states','Faster clock speed'],1],['The Church-Turing thesis relates to:',['Network speed','What is algorithmically computable','Database indexing','Cloud scalability'],1]]},
+ {d:25,s:'toc',t:'Decidability & the Halting Problem',ex:'Some problems can never be solved by any algorithm — the halting problem is the classic proof that undecidability exists.',kp:['Decidable: an algorithm always halts with yes/no','Undecidable: no algorithm can always decide correctly','Halting problem proven undecidable by Turing'],def:'Undecidable problem: a problem for which no algorithm can exist that always gives a correct yes/no answer for every input.',eg:'You cannot write a general program that always correctly predicts whether any other given program will halt or loop forever.',qr:'Decidable = an algorithm can always answer. The halting problem is the famous example proven to be undecidable.',
+  mc:[['The halting problem asks whether:',['A program is bug-free','A given program will eventually stop running','A program compiles','A program uses too much memory'],1],['A decidable problem is one where:',['No algorithm exists','An algorithm always halts with a correct yes/no','It runs forever','It\'s only solvable by humans'],1]]},
+ {d:26,s:'mix',t:'AI + CN Rapid Recap',ex:'Mixed recap pairing AI\'s search strategies with CN\'s transport protocols — two very different but exam-favorite pairs.',kp:['A* uses a heuristic; BFS explores by level','TCP is reliable & ordered; UDP is fast & unordered','Both areas love "compare and contrast" questions'],def:'Recap day: revisiting two subjects together to strengthen quick recall under exam time pressure.',eg:'If asked "compare two approaches," structure your answer the same way for A* vs BFS as for TCP vs UDP.',qr:'When comparing anything, structure by: what it optimizes for, and what it sacrifices — speed vs guarantee, memory vs accuracy.',
+  mc:[['Which pairing is correct?',['A* uses no heuristic, TCP is unreliable','A* uses a heuristic, TCP is reliable','BFS is informed search','UDP guarantees order'],1],['A good "compare and contrast" answer structure covers:',['Only definitions','What it optimizes for and what it trades off','Just examples','Nothing structured'],1]]},
+ {d:27,s:'mix',t:'Cloud + DPDP Rapid Recap',ex:'Cloud computing and data privacy intersect constantly — shared responsibility and privacy by design are exam favorites together.',kp:['IaaS/PaaS/SaaS control levels','Shared responsibility model for security','Privacy by design = protection embedded from the start'],def:'Recap day: reinforcing how cloud architecture choices directly affect an organization\'s privacy and security obligations.',eg:'Choosing SaaS shifts more security responsibility to the provider — but the customer still owns their data\'s privacy compliance.',qr:'Cloud service model chosen changes who\'s responsible for what — but privacy compliance for the data itself stays with you.',
+  mc:[['Choosing SaaS over IaaS shifts more responsibility to:',['The customer','The cloud provider','No one','The end user\'s device'],1],['Privacy by design applied to cloud systems means:',['Adding privacy features after launch','Building privacy protections in from the start','Ignoring compliance','Making everything public'],1]]},
+ {d:28,s:'mix',t:'Theory of Computation Rapid Recap',ex:'A quick pass through the automata hierarchy — from finite automata up to Turing machines — is the fastest way to lock TOC in memory.',kp:['Finite automata < Pushdown automata < Turing machines','Each level recognizes a strictly larger class of languages','Decidability sits at the very top of the hierarchy'],def:'Recap day: reviewing the automata hierarchy as one connected ladder rather than five separate topics.',eg:'Balanced brackets need a PDA (not a DFA); general computation needs a full Turing machine (not just a PDA).',qr:'Remember the ladder: regular (DFA) → context-free (PDA) → recursively enumerable (Turing machine) — each strictly more powerful.',
+  mc:[['Which is the correct power ordering (weakest to strongest)?',['Turing machine, PDA, DFA','DFA, PDA, Turing machine','PDA, Turing machine, DFA','All are equal'],1],['Decidability concerns:',['Whether a language is regular','Whether an algorithm can always give a correct answer','Network speed','Memory allocation'],1]]},
+ {d:29,s:'mix',t:'Full-Syllabus Rapid Fire',ex:'A mixed set pulling one sharp question from each of the five subjects — the closest simulation of exam pressure before the final day.',kp:['One AI, CN, Cloud, DPDP, and TOC question each','Timed self-test recommended','Review any missed answers immediately after'],def:'Rapid fire: a mixed-subject quiz format designed to simulate the unpredictability of a real exam paper.',eg:'Treat this like a mock test — don\'t look at the explanations until you\'ve committed to an answer for each question.',qr:'The goal today isn\'t new content — it\'s proving you can switch between all five subjects without losing accuracy.',
+  mc:[['Which subject deals with pushdown automata?',['Cloud Computing','Theory of Computation','Data Privacy','Computer Networks'],1],['Which subject deals with the shared responsibility model?',['Artificial Intelligence','Cloud Computing','Theory of Computation','None'],1]]},
+ {d:30,s:'mix',t:'Final Victory Challenge',ex:'The last stand — a tougher mixed quiz covering the hardest ideas from all 30 days, capping off the journey.',kp:['Revisit anything you scored low on earlier','This is the hardest day by design','Completing it unlocks the Victory screen'],def:'Victory Challenge: the final checkpoint testing retention across the entire 30-day syllabus sweep.',eg:'If you can answer both questions below without hesitation, you\'ve genuinely internalized the syllabus, not just skimmed it.',qr:'You\'ve covered AI, CN, Cloud, DPDP, and TOC — today just proves it stuck. Answer carefully, then claim your victory.',
+  mc:[['A rational agent is best defined as one that:',['Always picks the fastest action','Maximizes its performance measure given what it knows','Never uses a heuristic','Ignores the environment'],1],['What connects TCP, PDAs, and the shared responsibility model as exam topics?',['Nothing, they\'re unrelated','Each defines a system\'s guarantees and where its limits lie','They are all part of AI','They are all deprecated'],1]]}
+];
+
+let state = {completed:[], theme:'light', streak:0, lastDate:null, history:[]};
+try{ const saved = JSON.parse(localStorage.getItem('techdussehra_state')); if(saved) state = Object.assign({history:[]}, saved); }catch(e){}
+
+function saveState(){ try{ localStorage.setItem('techdussehra_state', JSON.stringify(state)); }catch(e){} }
+
+function unlockedUpTo(){ return Math.min(30, state.completed.length + 1); }
+
+function applyTheme(){
+  document.body.classList.toggle('dark', state.theme==='dark');
+  document.getElementById('themeBtn').textContent = state.theme==='dark' ? '☀ Light' : '☾ Dark';
+}
+
+function renderSubjFilters(){
+  const box = document.getElementById('subjFilters');
+  box.innerHTML = '<button class="active" data-f="all">All</button>' +
+    Object.keys(SUBJECTS).map(k=>`<button data-f="${k}" style="background:${SUBJECTS[k].color};color:#fff;opacity:.55" data-c="${SUBJECTS[k].color}">${k.toUpperCase()}</button>`).join('');
+  box.addEventListener('click', e=>{
+    const btn = e.target.closest('button'); if(!btn) return;
+    box.querySelectorAll('button').forEach(b=>{b.classList.remove('active'); b.style.opacity = b===btn?1:.55;});
+    btn.classList.add('active'); btn.style.opacity = 1;
+    filterGrid();
+  });
+}
+function currentFilterSubj(){ const a = document.querySelector('#subjFilters button.active'); return a ? a.dataset.f : 'all'; }
+function filterGrid(){
+  const subj = currentFilterSubj();
+  const q = document.getElementById('search').value.trim().toLowerCase();
+  document.querySelectorAll('.day-card').forEach(c=>{
+    const item = DATA[+c.dataset.i];
+    const matchSubj = subj==='all' || item.s===subj;
+    const matchQ = !q || item.t.toLowerCase().includes(q) || SUBJECTS[item.s].name.toLowerCase().includes(q);
+    c.classList.toggle('hidden-card', !(matchSubj && matchQ));
+  });
+}
+document.getElementById('search').addEventListener('input', filterGrid);
+
+function renderSubjProgress(){
+  const box = document.getElementById('subjProgress');
+  box.innerHTML = Object.keys(SUBJECTS).map(k=>{
+    const days = DATA.filter(d=>d.s===k);
+    const done = days.filter(d=>state.completed.includes(d.d)).length;
+    const pct = Math.round(done/days.length*100);
+    return `<div class="sp-card"><div class="name" style="color:${SUBJECTS[k].color}">${SUBJECTS[k].name}</div>
+      <div class="bar-outer"><div class="bar-inner" style="width:${pct}%;background:${SUBJECTS[k].color}"></div></div>
+      <div class="pct">${done}/${days.length} · ${pct}%</div></div>`;
+  }).join('');
+}
+
+function renderGrid(){
+  const grid = document.getElementById('grid');
+  const unlocked = unlockedUpTo();
+  grid.innerHTML = DATA.map((item,i)=>{
+    const done = state.completed.includes(item.d);
+    const isUnlocked = item.d <= unlocked;
+    const isToday = item.d === unlocked && !done;
+    let cls = 'day-card' + (done?' completed':'') + (!isUnlocked?' locked':'') + (isToday?' today':'');
+    let statusSvg = done
+      ? '<svg viewBox="0 0 24 24" fill="none" stroke="'+SUBJECTS[item.s].color+'" stroke-width="2.2"><path d="M4 12l5 5L20 6"/></svg>'
+      : (!isUnlocked ? '<svg viewBox="0 0 24 24" fill="none" stroke="#9a8776" stroke-width="1.8"><rect x="5" y="10" width="14" height="9" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg>' : '');
+    return `<div class="${cls}" data-i="${i}">
+      <span class="dc-num">${String(item.d).padStart(2,'0')}</span>
+      <svg class="dc-icon" viewBox="0 0 24 24" fill="none" stroke="${SUBJECTS[item.s].color}" stroke-width="1.6"><path d="${ICONS[item.s]}"/></svg>
+      <span class="dc-subj" style="background:${SUBJECTS[item.s].color}">${item.s.toUpperCase()}</span>
+      <span class="dc-status">${statusSvg}</span>
+      ${isUnlocked ? '<span class="diya-dot"></span>' : ''}
+    </div>`;
+  }).join('');
+  grid.querySelectorAll('.day-card:not(.locked)').forEach(c=>{
+    c.addEventListener('click', ()=> openDay(+c.dataset.i));
+  });
+  filterGrid();
+}
+
+function updateHeader(){
+  const pct = Math.round(state.completed.length/30*100);
+  document.getElementById('progressPct').textContent = pct+'% complete';
+  document.getElementById('streakVal').textContent = state.streak;
+  document.getElementById('heroBar').style.width = pct+'%';
+  document.getElementById('heroLabel').textContent = state.completed.length+' / 30 days completed';
+}
+
+function openDay(i){
+  const item = DATA[i];
+  const overlay = document.getElementById('overlay');
+  const done = state.completed.includes(item.d);
+  document.getElementById('modalBody').innerHTML = `
+    <button class="closeX" id="closeX">&times;</button>
+    <p class="m-kicker" style="color:${SUBJECTS[item.s].color}">DAY ${item.d} · ${SUBJECTS[item.s].name.toUpperCase()}</p>
+    <h2 class="m-title">${item.t}</h2>
+    <div class="m-block"><h4>EXPLANATION</h4><p>${item.ex}</p></div>
+    <div class="m-block"><h4>KEY POINTS</h4><ul>${item.kp.map(k=>`<li>${k}</li>`).join('')}</ul></div>
+    <div class="m-block"><h4>DEFINITION</h4><p>${item.def}</p></div>
+    <div class="m-block"><h4>EXAMPLE</h4><p>${item.eg}</p></div>
+    <div class="m-block"><h4>QUICK REVISION</h4><div class="qr-box">${item.qr}</div></div>
+    <div class="m-block"><h4>QUIZ</h4><div id="quizBox"></div>
+      <button class="submitBtn" id="submitQuiz" style="${done?'display:none':''}">Submit Answers</button>
+      <div id="quizResult"></div>
+      <button class="completeBtn" id="completeBtn" style="${done?'':'display:none'}">${done?'✓ Day Completed':'Mark as Completed'}</button>
+    </div>`;
+  const quizBox = document.getElementById('quizBox');
+  const picks = new Array(item.mc.length).fill(null);
+  quizBox.innerHTML = item.mc.map((q,qi)=>`
+    <div class="quiz-q"><p>${qi+1}. ${q[0]}</p>
+      ${q[1].map((opt,oi)=>`<button class="opt" data-q="${qi}" data-o="${oi}">${opt}</button>`).join('')}
+    </div>`).join('');
+  quizBox.querySelectorAll('.opt').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      const qi = +b.dataset.q;
+      quizBox.querySelectorAll(`.opt[data-q="${qi}"]`).forEach(o=>o.classList.remove('picked'));
+      b.classList.add('picked');
+      picks[qi] = +b.dataset.o;
+    });
+  });
+  document.getElementById('submitQuiz').addEventListener('click', ()=>{
+    let score = 0;
+    item.mc.forEach((q,qi)=>{
+      quizBox.querySelectorAll(`.opt[data-q="${qi}"]`).forEach((o,oi)=>{
+        o.disabled = true;
+        if(oi===q[2]) o.classList.add('correct');
+        else if(oi===picks[qi]) o.classList.add('wrong');
+      });
+      if(picks[qi]===q[2]) score++;
+    });
+    document.getElementById('quizResult').innerHTML = `<p class="result-line">Score: ${score}/${item.mc.length}</p>`;
+    document.getElementById('submitQuiz').style.display='none';
+    document.getElementById('completeBtn').style.display='inline-block';
+    state.history.push({day:item.d, s:item.s, score, total:item.mc.length, ts:Date.now()});
+    saveState();
+  });
+  document.getElementById('completeBtn').addEventListener('click', ()=> markComplete(item.d));
+  document.getElementById('closeX').addEventListener('click', closeModal);
+  overlay.classList.add('show');
+}
+
+function closeModal(){ document.getElementById('overlay').classList.remove('show'); }
+document.getElementById('overlay').addEventListener('click', e=>{ if(e.target.id==='overlay') closeModal(); });
+
+function markComplete(day){
+  if(!state.completed.includes(day)) state.completed.push(day);
+  const today = new Date().toDateString();
+  if(state.lastDate !== today){
+    const y = new Date(); y.setDate(y.getDate()-1);
+    state.streak = (state.lastDate === y.toDateString()) ? state.streak+1 : 1;
+    state.lastDate = today;
+  }
+  saveState();
+  closeModal();
+  renderAll();
+  if(day===30) showVictory();
+}
+
+function showVictory(){
+  const totalQ = DATA.reduce((a,d)=>a+d.mc.length,0);
+  document.getElementById('modalBody').innerHTML = `
+    <div class="victory">
+      <h2>VICTORY ACHIEVED! 🪔</h2>
+      <p>30 / 30 days completed</p>
+      <p>Streak: ${state.streak} days</p>
+      <p>You conquered Third Year Computer Engineering.</p>
+      <button class="completeBtn" id="closeVictory" style="margin-top:16px">Close</button>
+    </div>`;
+  document.getElementById('overlay').classList.add('show');
+  document.getElementById('closeVictory').addEventListener('click', closeModal);
+}
+
+document.getElementById('themeBtn').addEventListener('click', ()=>{
+  state.theme = state.theme==='dark' ? 'light' : 'dark';
+  saveState(); applyTheme();
+});
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  if(confirm('Reset all progress? This cannot be undone.')){
+    state = {completed:[], theme:state.theme, streak:0, lastDate:null};
+    saveState(); renderAll();
+  }
+});
+document.getElementById('startBtn').addEventListener('click', ()=>{
+  const i = DATA.findIndex(d=>d.d===unlockedUpTo());
+  if(i>-1) openDay(i);
+});
+
+// --- weak-topic detection ---
+function latestAttemptPerDay(){
+  const m = {};
+  state.history.forEach(h=>{ m[h.day] = h; }); // last write wins = most recent attempt
+  return Object.values(m);
+}
+function computeWeakDays(limit=3){
+  return latestAttemptPerDay()
+    .map(h=>({...h, pct: Math.round(h.score/h.total*100)}))
+    .filter(h=>h.pct < 100)
+    .sort((a,b)=>a.pct-b.pct)
+    .slice(0, limit);
+}
+function computeSubjectAccuracy(){
+  const agg = {};
+  latestAttemptPerDay().forEach(h=>{
+    if(!agg[h.s]) agg[h.s] = {score:0, total:0};
+    agg[h.s].score += h.score; agg[h.s].total += h.total;
+  });
+  return Object.keys(SUBJECTS).map(k=>({
+    s:k, pct: agg[k] ? Math.round(agg[k].score/agg[k].total*100) : null
+  }));
+}
+
+function renderRevisionQueue(){
+  const weak = computeWeakDays();
+  const box = document.getElementById('rqBox');
+  if(weak.length===0){
+    box.innerHTML = `<h3>Revision Queue</h3><p class="sub">TOPICS TO REVISIT, WEAKEST FIRST</p>
+      <p class="rq-empty">No weak spots yet — attempt a few quizzes and this fills in automatically.</p>`;
+    return;
+  }
+  box.innerHTML = `<h3>Revision Queue</h3><p class="sub">TOPICS TO REVISIT, WEAKEST FIRST</p>` +
+    weak.map(h=>{
+      const item = DATA.find(d=>d.d===h.day);
+      return `<div class="rq-item">
+        <div><div class="name">${item.t}</div><div class="meta">Day ${h.day} · ${SUBJECTS[h.s].name} · scored ${h.pct}%</div></div>
+        <button data-day="${h.day}">Revise now</button>
+      </div>`;
+    }).join('');
+  box.querySelectorAll('.rq-item button').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      const i = DATA.findIndex(d=>d.d === +b.dataset.day);
+      if(i>-1) openDay(i);
+    });
+  });
+}
+
+let accChartInstance = null, subjChartInstance = null;
+function renderAnalytics(){
+  const weakList = document.getElementById('weakList');
+  const subjAcc = computeSubjectAccuracy();
+  const attempted = subjAcc.filter(s=>s.pct!==null);
+
+  weakList.innerHTML = '<h4 class="mono" style="font-size:11px;color:var(--dim);margin:0 0 12px;">ACCURACY BY SUBJECT (LOW → HIGH)</h4>' +
+    (attempted.length===0
+      ? '<p class="an-empty">Attempt some quizzes to see subject-level weak spots here.</p>'
+      : attempted.slice().sort((a,b)=>a.pct-b.pct).map(s=>`
+        <div class="weak-row"><span class="swatch" style="background:${SUBJECTS[s.s].color}"></span>
+          <span class="lbl">${SUBJECTS[s.s].name}</span><span class="pct">${s.pct}%</span></div>`).join(''));
+
+  if(typeof Chart === 'undefined') return; // library failed to load, skip charts gracefully
+
+  const hist = state.history;
+  const accCtx = document.getElementById('accChart');
+  const subjCtx = document.getElementById('subjChart');
+  if(accChartInstance) accChartInstance.destroy();
+  if(subjChartInstance) subjChartInstance.destroy();
+
+  accChartInstance = new Chart(accCtx, {
+    type:'line',
+    data:{ labels: hist.map((h,i)=>'Q'+(i+1)),
+      datasets:[{ label:'Accuracy %', data: hist.map(h=>Math.round(h.score/h.total*100)),
+        borderColor:'#7a1f2b', backgroundColor:'#7a1f2b33', tension:.3, fill:true, pointRadius:3 }]},
+    options:{ responsive:true, plugins:{legend:{display:false}}, scales:{y:{min:0,max:100}} }
+  });
+
+  subjChartInstance = new Chart(subjCtx, {
+    type:'bar',
+    data:{ labels: attempted.map(s=>s.s.toUpperCase()),
+      datasets:[{ label:'Accuracy %', data: attempted.map(s=>s.pct),
+        backgroundColor: attempted.map(s=>SUBJECTS[s.s].color) }]},
+    options:{ responsive:true, plugins:{legend:{display:false}}, scales:{y:{min:0,max:100}} }
+  });
+}
+
+function switchView(v){
+  document.getElementById('navTabs').querySelectorAll('button').forEach(b=>b.classList.toggle('active', b.dataset.v===v));
+  document.getElementById('heroSection').style.display = v==='cal' ? '' : 'none';
+  document.getElementById('calendarView').style.display = v==='cal' ? '' : 'none';
+  document.getElementById('analyticsView').style.display = v==='an' ? 'block' : 'none';
+  if(v==='an') renderAnalytics();
+}
+document.getElementById('navTabs').addEventListener('click', e=>{
+  const b = e.target.closest('button'); if(!b) return;
+  switchView(b.dataset.v);
+});
+
+// --- PWA: real manifest.json + sw.js (needs HTTPS hosting, e.g. GitHub Pages) ---
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=> navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+}
+
+function updateOfflineBanner(){ document.getElementById('offlineBanner').classList.toggle('show', !navigator.onLine); }
+window.addEventListener('online', updateOfflineBanner);
+window.addEventListener('offline', updateOfflineBanner);
+updateOfflineBanner();
+
+function renderAll(){
+  applyTheme(); renderSubjFilters(); renderSubjProgress(); renderGrid(); updateHeader(); renderRevisionQueue();
+}
+renderAll();
+</script>
+</body>
+</html>
