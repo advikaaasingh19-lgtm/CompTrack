@@ -1,4 +1,4 @@
-# CompTrack — Tech Dussehra
+# CompTrack - Tracks progress
 
 A 30-day, advent-calendar-style study app for Third Year Computer Engineering students.
 Each day unlocks a new topic with a short explanation, key points, a definition, an example,
