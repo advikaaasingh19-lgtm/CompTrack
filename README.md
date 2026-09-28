@@ -1,37 +1,44 @@
-# Tech Dussehra — 30 Days of Third Year Computer Engineering
+# CompTrack — Tech Dussehra
 
-A Dussehra-themed advent-calendar study app covering AI, Computer Networks, Cloud Computing,
-Data Privacy & Protection, and Theory of Computation. Single self contained HTML file no
-build step, no backend, no dependencies to install.
+A 30-day, advent-calendar-style study app for Third Year Computer Engineering students.
+Each day unlocks a new topic with a short explanation, key points, a definition, an example,
+a quick-revision note and a quiz. Covers AI, Computer Networks, Cloud Computing,
+Data Privacy & Protection, and Theory of Computation.
+
+**Live demo:** https://advikaaasingh19-lgtm.github.io/CompTrack/
 
 ## Features
-- 30-day unlockable study calendar with per-day explanations, key points, and quizzes
-- Streak tracking, overall + subject-wise progress bars
-- Analytics dashboard custom SVG charts accuracy over time, accuracy by subject
-- Weak-topic detector + revision queue (surfaces your lowest-scoring days first)
-- Dark/light mode, search + subject filters, reset with confirmation
-- PWA-ready: web app manifest + offline-caching service worker
-- All progress stored in the browser via `localStorage`  no login, no server
+- 30 sequentially unlocking study days with quizzes and instant scoring
+- Streak tracking, overall progress and per-subject progress bars
+- Analytics dashboard with custom-built SVG charts (accuracy over time, accuracy by subject)
+- Weak-topic detector and revision queue that surfaces your lowest-scoring days first
+- Installable PWA with a service worker for offline use
+- Dark/light theme, topic search and subject filters
+- All progress stored in the browser with `localStorage`. No login, no backend.
 
-## Run it locally
-Just open `index.html` in a browser. That's it.
+## Tech
+Vanilla HTML, CSS and JavaScript. No framework, no build step, no runtime dependencies.
 
-## Deploy on GitHub Pages (free hosting + working PWA install)
-1. Create a new GitHub repo, e.g. `tech-dussehra`.
-2. Add `index.html` (rename the file to exactly `index.html`) to the repo root and push.
-3. In the repo: **Settings → Pages → Source** → select the `main` branch, `/ (root)` folder → **Save**.
-4. GitHub gives you a live URL like `https://<your-username>.github.io/tech-dussehra/`.
-5. Because it's now served over real HTTPS from your own domain (not a preview iframe),
-   the "Add to Home Screen" / install prompt and offline caching will actually work 
-   they're disabled inside sandboxed previews by design.
+| File | Purpose |
+|------|---------|
+| `index.html` | App UI, logic and all 30 days of content |
+| `manifest.json` | PWA install metadata |
+| `sw.js` | Service worker for offline caching |
+| `icon-192.png`, `icon-512.png` | App icons |
+
+## Run locally
+Open `index.html` in a browser. For the service worker and install prompt, serve it over
+HTTPS or `localhost` (for example `python -m http.server`).
 
 ## Editing content
-All 30 days live in the `DATA` array near the top of the `<script>` tag in `index.html`.
-Each entry is one object: topic, explanation, key points, definition, example, quick-revision
-line, and quiz questions. Add, edit, or reorder entries there — everything else (unlock logic,
-progress bars, charts, revision queue) reads from that array automatically.
+All study content lives in the `DATA` array in the `<script>` section of `index.html`.
+Each entry holds the topic, explanation, key points, definition, example, quick-revision
+line and quiz questions. Progress bars, unlock logic, charts and the revision queue all
+read from that array.
 
-## Tech notes
-- Vanilla HTML/CSS/JS — chosen over a React build so it needs zero tooling to host or hand in.
-- Chart.js loaded via CDN (cdnjs) for the analytics dashboard.
-- Fonts: Fraunces (headings) + JetBrains Mono (labels) via Google Fonts.
+## How it works
+- **Unlocking:** day *n* opens once day *n−1* is marked complete.
+- **Weak-topic detection:** every quiz attempt is logged with its score. The revision queue
+  takes each day's most recent attempt and sorts by accuracy, lowest first.
+- **Offline support:** `sw.js` caches responses and falls back to the cache when the network
+  is unavailable.
