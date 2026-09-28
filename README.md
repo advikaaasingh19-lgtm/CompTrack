@@ -7,7 +7,7 @@ build step, no backend, no dependencies to install.
 ## Features
 - 30-day unlockable study calendar with per-day explanations, key points, and quizzes
 - Streak tracking, overall + subject-wise progress bars
-- Analytics dashboard (Chart.js)  accuracy over time, accuracy by subject
+- Analytics dashboard custom SVG charts accuracy over time, accuracy by subject
 - Weak-topic detector + revision queue (surfaces your lowest-scoring days first)
 - Dark/light mode, search + subject filters, reset with confirmation
 - PWA-ready: web app manifest + offline-caching service worker
