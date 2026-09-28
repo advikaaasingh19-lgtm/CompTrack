@@ -564,7 +564,7 @@ function switchView(v){
   document.getElementById('navTabs').querySelectorAll('button').forEach(b=>b.classList.toggle('active', b.dataset.v===v));
   document.getElementById('heroSection').style.display = v==='cal' ? '' : 'none';
   document.getElementById('calendarView').style.display = v==='cal' ? '' : 'none';
-  document.getElementById('analyticsView').style.display = v==='an' ? '' : 'none';
+  document.getElementById('analyticsView').style.display = v==='an' ? 'block' : 'none';
   if(v==='an') renderAnalytics();
 }
 document.getElementById('navTabs').addEventListener('click', e=>{
