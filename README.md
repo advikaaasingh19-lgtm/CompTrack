@@ -1,17 +1,17 @@
 # Tech Dussehra — 30 Days of Third Year Computer Engineering
 
 A Dussehra-themed advent-calendar study app covering AI, Computer Networks, Cloud Computing,
-Data Privacy & Protection, and Theory of Computation. Single self-contained HTML file — no
+Data Privacy & Protection, and Theory of Computation. Single self contained HTML file no
 build step, no backend, no dependencies to install.
 
 ## Features
 - 30-day unlockable study calendar with per-day explanations, key points, and quizzes
 - Streak tracking, overall + subject-wise progress bars
-- Analytics dashboard (Chart.js) — accuracy over time, accuracy by subject
+- Analytics dashboard (Chart.js)  accuracy over time, accuracy by subject
 - Weak-topic detector + revision queue (surfaces your lowest-scoring days first)
 - Dark/light mode, search + subject filters, reset with confirmation
 - PWA-ready: web app manifest + offline-caching service worker
-- All progress stored in the browser via `localStorage` — no login, no server
+- All progress stored in the browser via `localStorage`  no login, no server
 
 ## Run it locally
 Just open `index.html` in a browser. That's it.
@@ -22,7 +22,7 @@ Just open `index.html` in a browser. That's it.
 3. In the repo: **Settings → Pages → Source** → select the `main` branch, `/ (root)` folder → **Save**.
 4. GitHub gives you a live URL like `https://<your-username>.github.io/tech-dussehra/`.
 5. Because it's now served over real HTTPS from your own domain (not a preview iframe),
-   the "Add to Home Screen" / install prompt and offline caching will actually work —
+   the "Add to Home Screen" / install prompt and offline caching will actually work 
    they're disabled inside sandboxed previews by design.
 
 ## Editing content
