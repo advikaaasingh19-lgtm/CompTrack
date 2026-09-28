@@ -7,8 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <meta name="theme-color" content="#7a1f2b">
-<link id="manifestLink" rel="manifest" href="">
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23e08a1e' d='M12 2c2 3-1 4-1 7a3 3 0 106 0c0-2-1-3-1-5 2 2 3 5 3 8a7 7 0 11-14 0c0-4 2-7 7-10z'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
 <style>
 :root{
@@ -572,33 +572,10 @@ document.getElementById('navTabs').addEventListener('click', e=>{
   switchView(b.dataset.v);
 });
 
-// --- PWA: manifest + offline-capable service worker (installability needs your own HTTPS domain) ---
-try{
-  const manifest = {
-    name:'Tech Dussehra — 30 Days of TY CompE', short_name:'Tech Dussehra', start_url:'.', display:'standalone',
-    background_color:'#faf1de', theme_color:'#7a1f2b',
-    icons:[{src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23e08a1e' d='M12 2c2 3-1 4-1 7a3 3 0 106 0c0-2-1-3-1-5 2 2 3 5 3 8a7 7 0 11-14 0c0-4 2-7 7-10z'/%3E%3C/svg%3E", sizes:'any', type:'image/svg+xml'}]
-  };
-  const manifestBlob = new Blob([JSON.stringify(manifest)], {type:'application/manifest+json'});
-  document.getElementById('manifestLink').href = URL.createObjectURL(manifestBlob);
-
-  const swSource = `
-    const CACHE = 'techdussehra-v1';
-    self.addEventListener('install', e => self.skipWaiting());
-    self.addEventListener('activate', e => self.clients.claim());
-    self.addEventListener('fetch', e => {
-      e.respondWith(
-        caches.open(CACHE).then(cache =>
-          fetch(e.request).then(res => { cache.put(e.request, res.clone()); return res; })
-            .catch(() => cache.match(e.request))
-        )
-      );
-    });`;
-  if('serviceWorker' in navigator){
-    const swBlob = new Blob([swSource], {type:'application/javascript'});
-    navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(()=>{});
-  }
-}catch(e){}
+// --- PWA: real manifest.json + sw.js (needs HTTPS hosting, e.g. GitHub Pages) ---
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=> navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+}
 
 function updateOfflineBanner(){ document.getElementById('offlineBanner').classList.toggle('show', !navigator.onLine); }
 window.addEventListener('online', updateOfflineBanner);
